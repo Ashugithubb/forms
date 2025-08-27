@@ -1,0 +1,59 @@
+
+
+When you use `express-session` (and by extension in NestJS), a **session object** is stored in memory (or in Redis/DB if you configure a store).
+
+### What’s stored in session RAM:
+
+1. **Session ID (SID)**
+
+   * A unique random string (e.g., `"s:98H7dgHhL...abc"`)
+   * Stored as the key in memory (or Redis, etc.)
+   * Also sent to the client inside a **cookie** (`connect.sid` by default).
+
+2. **Session Data (key-value object)**
+
+   * This is the data you add to `req.session` in your app.
+     Example:
+
+   ```ts
+   req.session.userId = 42;
+   req.session.role = "admin";
+   ```
+
+   Inside RAM it looks like:
+
+   ```json
+   {
+     "cookie": {
+       "originalMaxAge": 86400000,
+       "expires": "2025-08-27T16:00:00.000Z",
+       "httpOnly": true,
+       "path": "/"
+     },
+     "userId": 42,
+     "role": "admin"
+   }
+   ```
+
+3. **Cookie Metadata**
+
+   * Expiry time (`maxAge` or `expires`)
+   * Path, domain, httpOnly, secure, etc.
+
+So in memory, the **Session Store** is like a big map/dictionary:
+
+```
+{
+  "sid1abc123": {
+     cookie: {...},
+     userId: 42,
+     role: "admin"
+  },
+  "sid2xyz456": {
+     cookie: {...},
+     userId: 88,
+     role: "student"
+  }
+}
+```
+
